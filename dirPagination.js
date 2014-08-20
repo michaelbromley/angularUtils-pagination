@@ -19,7 +19,7 @@
     /**
      * Config
      */
-    var moduleName = 'YOUR_APP_MODULE_NAME';
+    var moduleName = 'angularUtils.directives.dirPagination';
     var templatePath = 'directives/pagination/dirPagination.tpl.html';
 
     /**
@@ -29,8 +29,8 @@
     try {
         module = angular.module(moduleName);
     } catch(err) {
-        // named module does not exist, so create one with a default name
-        module = angular.module('angularUtils.directives.dirPagination', []);
+        // named module does not exist, so create one
+        module = angular.module(moduleName, []);
     }
 
     module.directive('dirPaginate', ['$compile', '$parse', '$timeout', 'paginationService', function($compile, $parse, $timeout, paginationService) {
