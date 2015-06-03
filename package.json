@@ -1,6 +1,6 @@
 {
   "name": "angular-utils-pagination",
-  "version": "0.8.0",
+  "version": "0.8.2",
   "description": "Magical automatic pagination for anything in AngularJS",
   "main": "index.js",
   "scripts": {
