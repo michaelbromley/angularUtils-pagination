@@ -10,9 +10,9 @@
   "moduleType": [
     "globals"
   ],
-  "dependencies": [
-	"angular": ">=1.1.4"
-  ],
+  "dependencies": {
+    "angular": ">=1.1.4"
+  },
   "keywords": [
     "angularjs",
     "pagination",
