@@ -1,8 +1,8 @@
 {
   "name": "angular-utils-pagination",
-  "version": "0.8.4",
+  "version": "0.9.0",
   "description": "Magical automatic pagination for anything in AngularJS",
-  "main": "index.js",
+  "main": "dirPagination.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
