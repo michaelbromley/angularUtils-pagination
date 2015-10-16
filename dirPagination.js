@@ -25,15 +25,7 @@
     /**
      * Module
      */
-    var module;
-    try {
-        module = angular.module(moduleName);
-    } catch(err) {
-        // named module does not exist, so create one
-        module = angular.module(moduleName, []);
-    }
-
-    module
+    angular.module(moduleName, [])
         .directive('dirPaginate', ['$compile', '$parse', 'paginationService', dirPaginateDirective])
         .directive('dirPaginateNoCompile', noCompileDirective)
         .directive('dirPaginationControls', ['paginationService', 'paginationTemplate', dirPaginationControlsDirective])
@@ -47,6 +39,7 @@
         return  {
             terminal: true,
             multiElement: true,
+            priority: 100,
             compile: dirPaginationCompileFn
         };
 
@@ -56,7 +49,7 @@
             // regex taken directly from https://github.com/angular/angular.js/blob/v1.4.x/src/ng/directive/ngRepeat.js#L339
             var match = expression.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+track\s+by\s+([\s\S]+?))?\s*$/);
 
-            var filterPattern = /\|\s*itemsPerPage\s*:\s*(.*\(\s*\w*\)|([^\)]*?(?=as))|[^\)]*)/;
+            var filterPattern = /\|\s*itemsPerPage\s*:\s*(.*\(\s*\w*\)|([^\)]*?(?=\s+as\s+))|[^\)]*)/;
             if (match[2].match(filterPattern) === null) {
                 throw 'pagination directive: the \'itemsPerPage\' filter must be set.';
             }
@@ -188,8 +181,11 @@
             if (attrs.currentPage) {
                 currentPageGetter = $parse(attrs.currentPage);
             } else {
-                // if the current-page attribute was not set, we'll make our own
-                var defaultCurrentPage = paginationId + '__currentPage';
+                // If the current-page attribute was not set, we'll make our own.
+                // Replace any non-alphanumeric characters which might confuse
+                // the $parse service and give unexpected results.
+                // See https://github.com/michaelbromley/angularUtils/issues/233
+                var defaultCurrentPage = (paginationId + '__currentPage').replace(/\W/g, '_');
                 scope[defaultCurrentPage] = 1;
                 currentPageGetter = $parse(defaultCurrentPage);
             }
