@@ -1,7 +1,7 @@
 Package.describe({
   name: 'angularutils:pagination',
   summary: 'Magical automatic pagination for anything in AngularJS',
-  version: '0.9.4',
+  version: '0.10.0',
   git: 'https://github.com/michaelbromley/angularUtils-pagination'
 });
 
