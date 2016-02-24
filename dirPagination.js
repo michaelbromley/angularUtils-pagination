@@ -89,6 +89,7 @@
                         }
                     });
                 } else {
+                    paginationService.setAsyncModeFalse(paginationId);
                     scope.$watchCollection(function() {
                         return collectionGetter(scope);
                     }, function(collection) {
@@ -259,6 +260,13 @@
                 upper: 1,
                 total: 1
             };
+
+            scope.$watch('maxSize', function(val) {
+                if (val) {
+                    paginationRange = Math.max(scope.maxSize, 5);
+                    generatePagination();
+                }
+            });
 
             scope.$watch(function() {
                 if (paginationService.isRegistered(paginationId)) {
@@ -548,6 +556,10 @@
 
         this.setAsyncModeTrue = function(instanceId) {
             instances[instanceId].asyncMode = true;
+        };
+
+        this.setAsyncModeFalse = function(instanceId) {
+            instances[instanceId].asyncMode = false;
         };
 
         this.isAsyncMode = function(instanceId) {
