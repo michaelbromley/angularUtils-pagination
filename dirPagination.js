@@ -68,6 +68,9 @@
                 // Now that we have access to the `scope` we can interpolate any expression given in the paginationId attribute and
                 // potentially register a new ID if it evaluates to a different value than the rawId.
                 var paginationId = $parse(attrs.paginationId)(scope) || attrs.paginationId || DEFAULT_ID;
+                // In case rawId != paginationId we deregister using rawId for the sake of general cleanliness
+                // before registering using paginationId
+                paginationService.deregisterInstance(rawId);
                 paginationService.registerInstance(paginationId);
 
                 var repeatExpression = getRepeatExpression(expression, paginationId);
@@ -102,6 +105,12 @@
 
                 // Delegate to the link function returned by the new compilation of the ng-repeat
                 compiled(scope);
+                    
+                // When the scope is destroyed, we make sure to remove the reference to it in paginationService
+                // so that it can be properly garbage collected
+                scope.$on('$destroy', function destroyDirPagination() {
+                    paginationService.deregisterInstance(paginationId);
+                });
             };
         }
 
@@ -215,11 +224,8 @@
 
         var numberRegex = /^\d+$/;
 
-        return {
+        var DDO = {
             restrict: 'AE',
-            templateUrl: function(elem, attrs) {
-                return attrs.templateUrl || paginationTemplate.getPath();
-            },
             scope: {
                 maxSize: '=?',
                 onPageChange: '&?',
@@ -228,6 +234,23 @@
             },
             link: dirPaginationControlsLinkFn
         };
+
+        // We need to check the paginationTemplate service to see whether a template path or
+        // string has been specified, and add the `template` or `templateUrl` property to
+        // the DDO as appropriate. The order of priority to decide which template to use is
+        // (highest priority first):
+        // 1. paginationTemplate.getString()
+        // 2. attrs.templateUrl
+        // 3. paginationTemplate.getPath()
+        var templateString = paginationTemplate.getString();
+        if (templateString !== undefined) {
+            DDO.template = templateString;
+        } else {
+            DDO.templateUrl = function(elem, attrs) {
+                return attrs.templateUrl || paginationTemplate.getPath();
+            };
+        }
+        return DDO;
 
         function dirPaginationControlsLinkFn(scope, element, attrs) {
 
@@ -520,6 +543,10 @@
             }
         };
 
+        this.deregisterInstance = function(instanceId) {
+            delete instances[instanceId];
+        };
+        
         this.isRegistered = function(instanceId) {
             return (typeof instances[instanceId] !== 'undefined');
         };
@@ -573,15 +600,33 @@
     function paginationTemplateProvider() {
 
         var templatePath = 'angularUtils.directives.dirPagination.template';
+        var templateString;
 
+        /**
+         * Set a templateUrl to be used by all instances of <dir-pagination-controls>
+         * @param {String} path
+         */
         this.setPath = function(path) {
             templatePath = path;
+        };
+
+        /**
+         * Set a string of HTML to be used as a template by all instances
+         * of <dir-pagination-controls>. If both a path *and* a string have been set,
+         * the string takes precedence.
+         * @param {String} str
+         */
+        this.setString = function(str) {
+            templateString = str;
         };
 
         this.$get = function() {
             return {
                 getPath: function() {
                     return templatePath;
+                },
+                getString: function() {
+                    return templateString;
                 }
             };
         };
