@@ -8,6 +8,11 @@ dependency management via Bower, npm and other package managers.
 
 All documentation is also located in the [angularUtils project](https://github.com/michaelbromley/angularUtils/tree/master/src/directives/pagination).
 
+## Changelog
+
+Please see the [releases page](https://github.com/michaelbromley/angularUtils-pagination/releases) for details
+of each released version.
+
 ## Issues
 
 Please submit any issues to the [angularUtils issue tracker](https://github.com/michaelbromley/angularUtils/issues), not this one.
